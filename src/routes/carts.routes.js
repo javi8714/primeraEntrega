@@ -1,9 +1,10 @@
 import { Router } from "express"; 
-import { CartManager} from "../datao/cartManager.js";
-import { ProductManager } from "../datao/ProductManager.js";
+import { CartController} from "../controllers/cartController.js";
+import { ProductController } from "../controllers/productController.js";
 
-const cartService = new CartManager("carts.json");
-const productService = new ProductManager("products.json");
+
+const cartService = new CartController("carts.json");
+const productService = new ProductController("products.json");
 
 const router = Router();
 
@@ -15,6 +16,7 @@ router.post("/", async (req, res) => {
         res.json({ status: "error", message: error.message });
     }
 });
+
 
 // Traigo todos los carritos
 router.get("/", async (req, res) => {

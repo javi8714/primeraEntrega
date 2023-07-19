@@ -1,9 +1,11 @@
 import { Router } from "express"; 
-import { ProductManager } from "../datao/ProductManager";
+import { ProductController } from "../controllers/productController.js";
 import { __dirname } from '../utils.js';
 
 
-const productService = new ProductManager('/products.json')
+const productService = new ProductController('/products.json')
+const router = Router();
+
 
 const validateFields = (req,res,next)=>{
     const productInfo = req.body
@@ -14,8 +16,7 @@ const validateFields = (req,res,next)=>{
     }
 }
 
-const router = Router();
-
+// Obtengo los prod de acuerdo al limite de prod que ingrese
 router.get("/", async (req, res) => {
     try {
         const limit = req.query.limit;
@@ -42,11 +43,20 @@ router.get("/", async (req, res) => {
 });
 
 
+// Retorno el prod por id: http://localhost:8080
+router.get("/:pid", async (req, res) => {
+    try {
+        let pid = req.params.pid;
+        let result = await productService.getProductById(pid);
+        res.json({ status: 'success', data: result });
+    } catch (error) {
+        res.json({ status: 'error', message: error.message });
+        //throw new Error(error.message);
+    }
+});
 
-router.get("/:pid",(req,res)=>{});
-
+// Doy de alta el producto
 router.post("/",validateFields,async (req,res)=>{
-    //Agregar el producto
     try {
         const productInfo = req.body;
         const productsCreate = await productService.save(productInfo);
@@ -56,12 +66,31 @@ router.post("/",validateFields,async (req,res)=>{
     }
 });
 
-router.put("/:pid",validateFields,(req,res)=>{
-    const productInfo = req.body;
-    //actualizar el producto  
-})
+// Actualizo el producto segun id
+router.put("/:pid", validateFields,  async (req, res) => {
+    try {
+        let pid = req.params.pid;
+        let product = req.body;
+        let result =  await productService.updateProduct(pid, product);
+        result.id = pid;
+        res.json({ status: 'success', data: result });
+    } catch (error) {
+        res.json({ status: 'error', message: error.message });
+        //throw new Error(error.message);
+    }
+});
 
-router.delete("/:pid",(req,res)=>{});
+// Doy de baja el producto segun ID
+router.delete("/:pid", async (req, res) => { 
+    try {
+        let pid = req.params.pid;
+        let result =  await productService.deleteProduct(pid);
+        res.json({ status: "success", data: deleteProduct, message: "Producto borrado!" });
+    } catch (error) {
+        res.json({ status: 'error', message: error.message });
+    }
+});
+
 
 
 export {router as productsRouter}

@@ -5,8 +5,7 @@ import fs from "fs";
 export class CartManager {
   constructor(fileName) {
     this.path=path.join(__dirname,`/files/${fileName}`); //src/files/carts.json
-    this.products = [];
-    this.loadProducts();
+    
   };
    
   fileExists() {
